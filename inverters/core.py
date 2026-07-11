@@ -1,18 +1,22 @@
 from typing import Dict, Type
+from logging import getLogger
 
 from felicity_ivem import FelicityIvemInverter
-from interfaces import Inverter
+from interfaces import Inverter, InverterModel
 
-_INVERTER_MODEL_CLASS_MAP: Dict[str, Type[Inverter]] = {
-    "IVEM_12048-II": FelicityIvemInverter
+logger = getLogger(__name__)
+
+_INVERTER_MODEL_CLASS_MAP: Dict[InverterModel, Type[Inverter]] = {
+    InverterModel.IVEM12048II: FelicityIvemInverter
 }
 
 
-def get_inverter_class(model: str) -> Type[Inverter]:
-    inverter_class = _INVERTER_MODEL_CLASS_MAP.get(model.lower(), None)
+def get_inverter_class(model: InverterModel) -> Type[Inverter]:
+    target_class = _INVERTER_MODEL_CLASS_MAP.get(model, None)
 
-    if inverter_class:
-        return inverter_class
-
-    raise NotImplementedError(
-        f"Inverter model {model} has not been implemented")
+    if not target_class:
+        logger.error(
+            "Driver lookup failed. Model enum '%s' has no mapped class.", model.name)
+        raise NotImplementedError(
+            f"Driver for model {model.value} is missing in registry.")
+    return target_class
