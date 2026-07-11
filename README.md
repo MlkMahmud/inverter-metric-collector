@@ -1,1 +1,1 @@
-# inverter-mqtt-bridge
+# inverter-metric-collector
