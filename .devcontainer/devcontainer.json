@@ -1,0 +1,17 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/python:dev-3.14-bookworm",
+  "postCreateCommand": "bash ./.devcontainer/setup.sh",
+  "containerEnv": {
+    "PYTHONPATH": "." // For VS Code's test pane discovery
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "esbenp.prettier-vscode",
+        "ms-python.isort"
+      ]
+    }
+  }
+}
