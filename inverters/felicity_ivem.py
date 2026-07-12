@@ -1,12 +1,14 @@
 from typing import List
 
-from inverters.interfaces import (
-    Metric,
-    ModbusConfig,
-    NumericRegisterDefinition,
-    RegisterBlock,
-    TextRegisterDefinition
-)
+from pymodbus.client import ModbusSerialClient
+from structlog import get_logger
+
+from inverters.interfaces import (Metric, ModbusConfig,
+                                  NumericRegisterDefinition, RegisterBlock,
+                                  TextRegisterDefinition)
+from utils import retry
+
+logger = get_logger()
 
 
 class FelicityIvemInverter:
@@ -127,5 +129,38 @@ class FelicityIvemInverter:
         self.config = config
         self.model = model
 
+        self.modbus_client = ModbusSerialClient(
+            baudrate=self.config.baudrate,
+            bytesize=self.config.bytesize,
+            parity=self.config.parity,
+            port=self.config.port,
+            stopbits=self.config.stopbits,
+            timeout=self.config.timeout,
+        )
+
+    def _establish_connection(self):
+        logger.info(
+            "Opening serial port interface transaction line", port=self.config.port)
+
+        is_connected = retry(
+            fn=self.modbus_client.connect,
+            delay=3,
+            retries=3,
+        )
+
+        if not is_connected:
+            raise ConnectionError(
+                f"Failed to open Modbus serial connection link on port {self.config.port}. "
+                "Check physical cable mapping, permissions, or system device availability."
+            )
+
+        logger.info(
+            "Modbus serial network interface online",
+            port=self.config.port
+        )
+
     def read_telemetry(self) -> List[Metric]:
+        if not self.modbus_client.connected:
+            self._establish_connection()
+
         return []

@@ -4,16 +4,18 @@ from pydantic import ValidationError
 from structlog import get_logger
 
 from .generic import GenericPublisher
+from .homeassistant import HomeAssistantPublisher
 from .interfaces import Publisher, PublisherConfig, Publishers
 
 logger = get_logger(__name__)
 
-_PUBLISHER_MAP: Dict[Publishers, Type[Publisher]] = {
-    Publishers.GENERIC: GenericPublisher
+_PUBLISHER_MAP: Dict[Publishers, Type[Publisher[PublisherConfig]]] = {
+    Publishers.GENERIC: GenericPublisher,
+    Publishers.HOME_ASSISTANT: HomeAssistantPublisher
 }
 
 
-def _create_publisher(config_str: str) -> Publisher:
+def _create_publisher(config_str: str) -> Publisher[PublisherConfig]:
     try:
         config = PublisherConfig.model_validate_json(config_str, extra="allow")
         publisher_class = _get_publisher(Publishers(config.name))
@@ -28,7 +30,7 @@ def _create_publisher(config_str: str) -> Publisher:
         raise e
 
 
-def _get_publisher(name: Publishers) -> Type[Publisher]:
+def _get_publisher(name: Publishers) -> Type[Publisher[PublisherConfig]]:
     publisher = _PUBLISHER_MAP.get(name, None)
 
     if not publisher:
@@ -40,8 +42,8 @@ def _get_publisher(name: Publishers) -> Type[Publisher]:
     return publisher
 
 
-def create_publishers(configs: List[str]) -> List[Publisher]:
-    publishers: List[Publisher] = []
+def create_publishers(configs: List[str]) -> List[Publisher[PublisherConfig]]:
+    publishers: List[Publisher[PublisherConfig]] = []
 
     for config in configs:
         publisher = _create_publisher(config)

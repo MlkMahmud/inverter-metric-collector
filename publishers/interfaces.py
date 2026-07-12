@@ -1,20 +1,9 @@
 from enum import StrEnum
-from typing import Any, List, Protocol, runtime_checkable
+from typing import Any, List, Protocol, runtime_checkable, TypeVar
 
 from pydantic import BaseModel, ConfigDict
 
 from inverters import Metric
-
-
-@runtime_checkable
-class Publisher(Protocol):
-    config: PublisherConfig
-
-    def __init__(self, config: PublisherConfig) -> None:
-        ...
-
-    def publish(self, metrics: List[Metric]) -> Any:
-        ...
 
 
 class PublisherConfig(BaseModel):
@@ -23,5 +12,18 @@ class PublisherConfig(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
+ConfigType = TypeVar("ConfigType", bound=PublisherConfig, covariant=True)
+
+
+@runtime_checkable
+class Publisher(Protocol[ConfigType]):
+    def __init__(self, config: ConfigType) -> None:
+        ...
+
+    def publish(self, metrics: List[Metric]) -> Any:
+        ...
+
+
 class Publishers(StrEnum):
     GENERIC = "generic"
+    HOME_ASSISTANT = "homeassistant"

@@ -8,7 +8,7 @@ from typing import List
 import structlog
 
 from inverters import InverterModel, ModbusConfig, get_inverter_class
-from publishers import create_publishers, Publisher
+from publishers import create_publishers, Publisher, PublisherConfig
 
 environment = os.environ.get("ENVIRONMENT", "dev")
 is_production = environment == "production"
@@ -128,7 +128,7 @@ def main() -> None:
         config=inverter.config,
     )
 
-    publishers: List[Publisher] = []
+    publishers: List[Publisher[PublisherConfig]] = []
 
     if args.publisher_configs:
         logger.info(
