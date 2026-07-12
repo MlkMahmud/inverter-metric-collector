@@ -1,11 +1,12 @@
-from logging import getLogger
 from typing import List
+
+from structlog import get_logger
 
 from inverters import Metric
 
 from .interfaces import PublisherConfig
 
-logger = getLogger("publisher.generic")
+logger = get_logger()
 
 
 class GenericPublisher:

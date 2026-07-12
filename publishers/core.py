@@ -1,12 +1,12 @@
-from logging import getLogger
 from typing import Dict, List, Type
 
 from pydantic import ValidationError
+from structlog import get_logger
 
 from .generic import GenericPublisher
 from .interfaces import Publisher, PublisherConfig, Publishers
 
-logger = getLogger(__name__)
+logger = get_logger(__name__)
 
 _PUBLISHER_MAP: Dict[Publishers, Type[Publisher]] = {
     Publishers.GENERIC: GenericPublisher
@@ -23,7 +23,7 @@ def _create_publisher(config_str: str) -> Publisher:
     except ValidationError as e:
         logger.error(
             "Publisher configuration is not valid",
-            extra={"config": config_str}
+            config=config_str
         )
         raise e
 
@@ -32,7 +32,7 @@ def _get_publisher(name: Publishers) -> Type[Publisher]:
     publisher = _PUBLISHER_MAP.get(name, None)
 
     if not publisher:
-        logger.error("Publisher lookup failed", extra={"publisher_name": name})
+        logger.error("Publisher lookup failed", publisher_name=name)
         raise NotImplementedError(
             f"Publisher '{name}' is not listed in registry"
         )

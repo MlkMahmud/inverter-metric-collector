@@ -8,4 +8,5 @@ dependencies = [
     "paho-mqtt>=2.1.0",
     "pydantic>=2.13.4",
     "pymodbus>=3.13.1",
+    "structlog>=26.1.0",
 ]

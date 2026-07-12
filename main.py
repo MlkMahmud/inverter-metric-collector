@@ -1,20 +1,37 @@
 import argparse
 import logging
+import os
 import sys
 import time
 from typing import List
 
+import structlog
+
 from inverters import InverterModel, ModbusConfig, get_inverter_class
 from publishers import create_publishers, Publisher
 
+environment = os.environ.get("ENVIRONMENT", "dev")
+is_production = environment == "production"
+
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] (%(name)s): %(message)s",
-    datefmt="%Y-%m-%dT%H:%M:%S",
-    handlers=[logging.StreamHandler(sys.stdout)],
+    format="%(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)]
 )
 
-logger = logging.getLogger("main")
+structlog.configure(
+    processors=[
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.add_log_level,
+        structlog.processors.JSONRenderer(
+        ) if is_production else structlog.dev.ConsoleRenderer(),
+
+    ],
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    wrapper_class=structlog.stdlib.BoundLogger,
+)
+
+logger = structlog.get_logger()
 
 
 def main() -> None:
@@ -90,7 +107,7 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.silent:
-        logger.setLevel(logging.WARN)
+        logging.getLogger().setLevel(logging.WARN)
 
     InverterClass = get_inverter_class(args.model)
 
@@ -105,19 +122,21 @@ def main() -> None:
         model=args.model,
     )
 
-    logger.info("Successfully initialized inverter", {
-        "model": inverter.model,
-        "config": inverter.config,
-    })
-
+    logger.info(
+        "Successfully initialized inverter",
+        model=inverter.model,
+        config=inverter.config,
+    )
 
     publishers: List[Publisher] = []
 
     if args.publisher_configs:
-        logger.info("Initializing publishers from provided configuration...")
+        logger.info(
+            "Initializing publishers from provided configuration...",
+            configuration=args.publisher_configs
+        )
         publishers = create_publishers(args.publisher_configs)
         logger.info("Successfully initialized all publishers")
-
 
     logger.info(f"Polling metrics every {args.interval}s...")
 
@@ -139,7 +158,7 @@ def main() -> None:
             time.sleep(max(0, args.interval - elapsed))
 
     except KeyboardInterrupt:
-        logger.info("\nExiting service daemon.")
+        logger.info("Exiting service daemon...")
         sys.exit(0)
 
 
