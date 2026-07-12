@@ -2,12 +2,14 @@ import argparse
 import logging
 import sys
 import time
+from typing import List
 
 from inverters import InverterModel, ModbusConfig, get_inverter_class
+from publishers import create_publishers, Publisher
 
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    format="%(asctime)s [%(levelname)s] (%(name)s): %(message)s",
     datefmt="%Y-%m-%dT%H:%M:%S",
     handlers=[logging.StreamHandler(sys.stdout)],
 )
@@ -99,20 +101,37 @@ def main() -> None:
             timeout=args.timeout,
             slave_id=args.slave_id,
             parity=args.parity
-        )
+        ),
+        model=args.model,
     )
 
-    print(
-        f"Connected to {args.model} via {inverter.config.port} ({inverter.config.baudrate} baud)")
-    print(f"Polling metrics every {args.interval}s...")
+    logger.info("Successfully initialized inverter", {
+        "model": inverter.model,
+        "config": inverter.config,
+    })
+
+
+    publishers: List[Publisher] = []
+
+    if args.publisher_configs:
+        logger.info("Initializing publishers from provided configuration...")
+        publishers = create_publishers(args.publisher_configs)
+        logger.info("Successfully initialized all publishers")
+
+
+    logger.info(f"Polling metrics every {args.interval}s...")
 
     try:
         while True:
             start_time = time.time()
 
             try:
-                data = inverter.read_telemetry()
-                logger.info(f"[Metrics]: {data}")
+                metrics = inverter.read_telemetry()
+                logger.info(f"[Metrics]: {metrics}")
+
+                for publisher in publishers:
+                    publisher.publish(metrics)
+
             except Exception as e:
                 logger.exception(f"Modbus Read Failure", exc_info=e)
 

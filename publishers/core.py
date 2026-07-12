@@ -3,17 +3,20 @@ from typing import Dict, List, Type
 
 from pydantic import ValidationError
 
-from publishers.interfaces import Publisher, PublisherConfig
+from .generic import GenericPublisher
+from .interfaces import Publisher, PublisherConfig, Publishers
 
 logger = getLogger(__name__)
 
-_PUBLISHER_MAP: Dict[str, Type[Publisher]] = {}
+_PUBLISHER_MAP: Dict[Publishers, Type[Publisher]] = {
+    Publishers.GENERIC: GenericPublisher
+}
 
 
 def _create_publisher(config_str: str) -> Publisher:
     try:
         config = PublisherConfig.model_validate_json(config_str, extra="allow")
-        publisher_class = _get_publisher(config.name)
+        publisher_class = _get_publisher(Publishers(config.name))
 
         return publisher_class(config)
 
@@ -25,7 +28,7 @@ def _create_publisher(config_str: str) -> Publisher:
         raise e
 
 
-def _get_publisher(name: str) -> Type[Publisher]:
+def _get_publisher(name: Publishers) -> Type[Publisher]:
     publisher = _PUBLISHER_MAP.get(name, None)
 
     if not publisher:

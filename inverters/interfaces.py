@@ -15,11 +15,12 @@ class Inverter(Protocol):
     Any class implementing these properties and methods fits this protocol.
     """
     config: ModbusConfig
+    model: str
 
-    def __init__(self, config: ModbusConfig) -> None:
+    def __init__(self, config: ModbusConfig, model: str) -> None:
         ...
 
-    def read_telemetry(self) -> Dict[str, Metric]:
+    def read_telemetry(self) -> List[Metric]:
         """Polls the inverter over Modbus and returns structured data."""
         ...
 

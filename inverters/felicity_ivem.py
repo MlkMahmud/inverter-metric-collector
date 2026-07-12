@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import List
 
 from inverters.interfaces import (
     Metric,
@@ -123,8 +123,9 @@ class FelicityIvemInverter:
         )
     ]
 
-    def __init__(self, config: ModbusConfig):
+    def __init__(self, config: ModbusConfig, model: str):
         self.config = config
+        self.model = model
 
-    def read_telemetry(self) -> Dict[str, Metric]:
-        return {}
+    def read_telemetry(self) -> List[Metric]:
+        return []
