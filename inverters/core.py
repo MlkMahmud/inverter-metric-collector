@@ -1,8 +1,8 @@
-from typing import Dict, Type
 from logging import getLogger
+from typing import Dict, Type
 
-from felicity_ivem import FelicityIvemInverter
-from interfaces import Inverter, InverterModel
+from inverters.felicity_ivem import FelicityIvemInverter
+from inverters.interfaces import Inverter, InverterModel
 
 logger = getLogger(__name__)
 

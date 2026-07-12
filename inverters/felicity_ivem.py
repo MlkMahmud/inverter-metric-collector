@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from .interfaces import (
+from inverters.interfaces import (
     Metric,
     ModbusConfig,
     NumericRegisterDefinition,
