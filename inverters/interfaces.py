@@ -52,11 +52,16 @@ class RegisterDefinition:
     address: int
 
 
-@dataclass
 class RegisterBlock:
     """Represents a contiguous chunk of Modbus memory registers."""
-    start_address: int
-    definitions: List[Union[NumericRegisterDefinition, TextRegisterDefinition]]
+
+    def __init__(self, start_address: int, definitions: List[Union[NumericRegisterDefinition, TextRegisterDefinition]]):
+        for index in range(len(definitions)):
+            if (start_address + index) != definitions[index].address:
+                raise ValueError(f"Definitions must be ordered by register address")
+
+        self.start_address = start_address
+        self.definitions = definitions
 
     @property
     def count(self) -> int:
