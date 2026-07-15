@@ -16,7 +16,6 @@ logger = get_logger()
 class FelicityIvemInverter:
     _REGISTER_BLOCKS: List[RegisterBlock] = [
         RegisterBlock(
-            start_address=0x1101,
             definitions=[
                 TextRegisterDefinition(
                     address=0x1101,
@@ -40,12 +39,7 @@ class FelicityIvemInverter:
                     address=0x1104,
                     key="power_flow_message",
                     lookup={}
-                )
-            ]
-        ),
-        RegisterBlock(
-            start_address=0x1108,
-            definitions=[
+                ),
                 NumericRegisterDefinition(
                     address=0x1108,
                     key="battery_voltage",
@@ -60,36 +54,16 @@ class FelicityIvemInverter:
                     address=0x110A,
                     key="battery_power",
                     unit="W"
-                )
-            ]
-        ),
-        RegisterBlock(
-            start_address=0x1111,
-            definitions=[
+                ),
                 NumericRegisterDefinition(
                     address=0x1111, key="ac_output_voltage", unit="V"
-                )
-            ]
-        ),
-        RegisterBlock(
-            start_address=0x1117,
-            definitions=[
+                ),
                 NumericRegisterDefinition(
                     address=0x1117, key="ac_input_voltage", unit="V"
-                )
-            ]
-        ),
-        RegisterBlock(
-            start_address=0x1119,
-            definitions=[
+                ),
                 NumericRegisterDefinition(
                     address=0x1119, key="ac_input_frequency", unit="Hz"
-                )
-            ]
-        ),
-        RegisterBlock(
-            start_address=0x111E,
-            definitions=[
+                ),
                 NumericRegisterDefinition(
                     address=0x111E, key="ac_output_active_power", unit="W"
                 ),
@@ -98,33 +72,18 @@ class FelicityIvemInverter:
                 ),
                 NumericRegisterDefinition(
                     address=0x1120, key="load_percentage", unit="%"
-                )
-            ]
-        ),
-        RegisterBlock(
-            start_address=0x1126,
-            definitions=[
+                ),
                 NumericRegisterDefinition(
                     address=0x1126, key="pv_input_voltage", unit="V"
                 ),
-            ]
-        ),
-        RegisterBlock(
-            start_address=0x112A,
-            definitions=[
                 NumericRegisterDefinition(
                     address=0x112A, key="pv_input_power", unit="W"
                 ),
-            ]
-        ),
-        RegisterBlock(
-            start_address=0x1132,
-            definitions=[
                 NumericRegisterDefinition(
                     address=0x1132, key="battery_percentage", unit="%"
                 )
             ]
-        )
+        ),
     ]
 
     def __init__(self, config: ModbusConfig, model: str):
@@ -170,7 +129,7 @@ class FelicityIvemInverter:
         for block in self._REGISTER_BLOCKS:
             try:
                 response = self.modbus_client.read_holding_registers(
-                    address=block.start_address,
+                    address=block.min_address,
                     count=block.count,
                     device_id=self.config.slave_id
                 )
@@ -180,7 +139,7 @@ class FelicityIvemInverter:
             except ModbusIOException as e:
                 logger.error(
                     "Failed to read register blocks",
-                    start_address=block.start_address,
+                    start_address=block.min_address,
                     count=block.count,
                     error=e
                 )

@@ -55,25 +55,23 @@ class RegisterDefinition:
 class RegisterBlock:
     """Represents a contiguous chunk of Modbus memory registers."""
 
-    def __init__(self, start_address: int, definitions: List[Union[NumericRegisterDefinition, TextRegisterDefinition]]):
-        for index in range(len(definitions)):
-            if (start_address + index) != definitions[index].address:
-                raise ValueError(f"Definitions must be ordered by register address")
-
-        self.start_address = start_address
+    def __init__(self, definitions: List[Union[NumericRegisterDefinition, TextRegisterDefinition]]):
         self.definitions = definitions
+        
+        self.min_address = min(register.address for register in definitions)
+        self.max_address = max(register.address for register in definitions)
+    
 
     @property
     def count(self) -> int:
         if not self.definitions:
             return 0
-        max_address = max(reg.address for reg in self.definitions)
-        return (max_address - self.start_address) + 1
+        return (self.max_address - self.min_address) + 1
 
     def parse_block_response(self, raw_words: List[int]) -> List[Metric]:
         metrics: List[Metric] = []
         for reg in self.definitions:
-            offset = reg.address - self.start_address
+            offset = reg.address - self.min_address
             if offset < len(raw_words):
                 metrics.append(reg.parse_word(raw_words[offset]))
         return metrics
