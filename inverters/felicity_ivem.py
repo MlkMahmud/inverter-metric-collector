@@ -1,7 +1,6 @@
 from typing import List
 
 from pymodbus.client import ModbusSerialClient
-from pymodbus.exceptions import ModbusIOException
 
 from structlog import get_logger
 
@@ -113,7 +112,7 @@ class FelicityIvemInverter:
                     unit="Hz"
                 ),
             ]
-        ),  
+        ),
         RegisterBlock(
             definitions=[
                 NumericRegisterDefinition(
@@ -354,21 +353,20 @@ class FelicityIvemInverter:
             self._establish_connection()
 
         for block in self._REGISTER_BLOCKS:
-            try:
-                response = self.modbus_client.read_holding_registers(
-                    address=block.min_address,
-                    count=block.count,
-                    device_id=self.config.slave_id
-                )
+            response = self.modbus_client.read_holding_registers(
+                address=block.min_address,
+                count=block.count,
+                device_id=self.config.slave_id
+            )
 
-                metrics.extend(block.parse_block_response(response.registers))
-
-            except ModbusIOException as e:
+            if response.isError():
                 logger.error(
-                    "Failed to read register blocks",
-                    start_address=block.min_address,
-                    count=block.count,
-                    error=e
+                    "Failed to read register block",
+                    block=block,
+                    error_code=response.exception_code
                 )
+                continue
+
+            metrics.extend(block.parse_block_response(response.registers))
 
         return metrics
