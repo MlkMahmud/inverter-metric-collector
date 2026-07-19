@@ -10,7 +10,8 @@
         "ms-python.python",
         "ms-python.vscode-pylance",
         "esbenp.prettier-vscode",
-        "ms-python.isort"
+        "ms-python.isort",
+        "streetsidesoftware.code-spell-checker"
       ]
     }
   }

@@ -36,7 +36,7 @@ logger = structlog.get_logger()
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Poll inverter metrics over Modbus and push to MQTT."
+        description="Poll inverter metrics over Modbus and publish to the destination of your choice."
     )
 
     parser.add_argument(
@@ -146,7 +146,6 @@ def main() -> None:
 
             try:
                 metrics = inverter.read_telemetry()
-                logger.info(f"[Metrics]: {metrics}")
 
                 for publisher in publishers:
                     publisher.publish(metrics)

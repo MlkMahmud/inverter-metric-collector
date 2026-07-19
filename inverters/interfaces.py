@@ -57,10 +57,9 @@ class RegisterBlock:
 
     def __init__(self, definitions: List[Union[NumericRegisterDefinition, TextRegisterDefinition]]):
         self.definitions = definitions
-        
+
         self.min_address = min(register.address for register in definitions)
         self.max_address = max(register.address for register in definitions)
-    
 
     @property
     def count(self) -> int:
@@ -81,12 +80,22 @@ class RegisterBlock:
 class NumericRegisterDefinition(RegisterDefinition):
     """Schema for registers containing analog or mathematical values."""
     unit: str
+
+    is_signed: Optional[bool] = False
     precision: Optional[float] = None
 
+    def _to_int16(self, raw_word: int) -> int:
+        if raw_word < 0b1000000000000000:
+            return raw_word
+
+        return raw_word - 0b10000000000000000
+
     def parse_word(self, raw_word: int) -> Metric:
-        parsed_value: Union[int, float] = raw_word
+        parsed_value: Union[int, float] = self._to_int16(
+            raw_word) if self.is_signed else raw_word
+
         if self.precision is not None:
-            parsed_value = round(raw_word * self.precision, 2)
+            parsed_value = round(parsed_value * self.precision, 2)
 
         return Metric(
             key=self.key,

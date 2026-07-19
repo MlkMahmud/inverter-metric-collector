@@ -28,59 +28,286 @@ class FelicityIvemInverter:
                 TextRegisterDefinition(
                     address=0x1102,
                     key="battery_charging_state",
-                    lookup={}
+                    lookup={
+                        0: "no_charge", 1: "constant_current", 2: "constant_voltage",
+                        3: "float"
+                    }
                 ),
                 TextRegisterDefinition(
                     address=0x1103,
                     key="fault_code",
-                    lookup={}
+                    lookup={
+                        1: "bus_voltage_too_high",
+                        2: "bus_voltage_too_low",
+                        3: "bus_soft_start_fail",
+                        4: "inverter_soft_start_fail",
+                        5: "over_current_or_surge_detected_by_software",
+                        6: "over_current_or_surge_detected_by_hardware"
+                    }
                 ),
                 TextRegisterDefinition(
                     address=0x1104,
                     key="power_flow_message",
                     lookup={}
                 ),
-                NumericRegisterDefinition(
-                    address=0x1108,
-                    key="battery_voltage",
-                    unit="V"
-                ),
-                NumericRegisterDefinition(
-                    address=0x1109,
-                    key="battery_current",
-                    unit="A",
-                ),
+            ]
+        ),
+        RegisterBlock(
+            definitions=[
                 NumericRegisterDefinition(
                     address=0x110A,
+                    is_signed=True,
                     key="battery_power",
                     unit="W"
                 ),
                 NumericRegisterDefinition(
-                    address=0x1111, key="ac_output_voltage", unit="V"
+                    address=0x110C,
+                    key="inverter_voltage",
+                    precision=0.1,
+                    unit="V",
                 ),
                 NumericRegisterDefinition(
-                    address=0x1117, key="ac_input_voltage", unit="V"
+                    address=0x110D,
+                    is_signed=True,
+                    key="inverter_current",
+                    precision=0.1,
+                    unit="A",
                 ),
                 NumericRegisterDefinition(
-                    address=0x1119, key="ac_input_frequency", unit="Hz"
+                    address=0x110E,
+                    key="inverter_frequency",
+                    precision=0.01,
+                    unit="Hz",
                 ),
                 NumericRegisterDefinition(
-                    address=0x111E, key="ac_output_active_power", unit="W"
+                    address=0x110F,
+                    is_signed=True,
+                    key="inverter_power",
+                    unit="W",
                 ),
                 NumericRegisterDefinition(
-                    address=0x111F, key="ac_output_apparent_power", unit="VA"
+                    address=0x1110,
+                    key="inverter_apparent_power",
+                    unit="VA",
                 ),
                 NumericRegisterDefinition(
-                    address=0x1120, key="load_percentage", unit="%"
+                    address=0x1111,
+                    key="ac_output_voltage",
+                    precision=0.1,
+                    unit="V"
+                ),
+            ]
+        ),
+        RegisterBlock(
+            definitions=[
+                NumericRegisterDefinition(
+                    address=0x1117,
+                    key="ac_input_voltage",
+                    precision=0.1,
+                    unit="V"
                 ),
                 NumericRegisterDefinition(
-                    address=0x1126, key="pv_input_voltage", unit="V"
+                    address=0x1119,
+                    key="ac_input_frequency",
+                    precision=0.01,
+                    unit="Hz"
+                ),
+            ]
+        ),  
+        RegisterBlock(
+            definitions=[
+                NumericRegisterDefinition(
+                    address=0x111E,
+                    is_signed=True,
+                    key="load_power",
+                    unit="W"
                 ),
                 NumericRegisterDefinition(
-                    address=0x112A, key="pv_input_power", unit="W"
+                    address=0x111F,
+                    key="ac_output_apparent_power",
+                    unit="VA"
                 ),
                 NumericRegisterDefinition(
-                    address=0x1132, key="battery_percentage", unit="%"
+                    address=0x1120,
+                    key="load_percentage",
+                    unit="%"
+                ),
+                NumericRegisterDefinition(
+                    address=0x1121,
+                    is_signed=True,
+                    key="transformer_temperature",
+                    unit="°C"
+                ),
+                NumericRegisterDefinition(
+                    address=0x1122,
+                    is_signed=True,
+                    key="inverter_temperature",
+                    unit="°C"
+                ),
+                NumericRegisterDefinition(
+                    address=0x1123,
+                    is_signed=True,
+                    key="battery_temperature",
+                    unit="°C"
+                ),
+                NumericRegisterDefinition(
+                    address=0x1124,
+                    key="bus_voltage",
+                    precision=0.1,
+                    unit="V"
+                ),
+            ]
+        ),
+        RegisterBlock(
+            definitions=[
+                NumericRegisterDefinition(
+                    address=0x1126,
+                    key="pv1_voltage",
+                    precision=0.1,
+                    unit="V"
+                ),
+                NumericRegisterDefinition(
+                    address=0x1129,
+                    is_signed=True,
+                    key="pv1_current",
+                    precision=0.1,
+                    unit="A"
+                ),
+                NumericRegisterDefinition(
+                    address=0x112A,
+                    is_signed=True,
+                    key="pv1_power",
+                    unit="W"
+                ),
+                NumericRegisterDefinition(
+                    address=0x112B,
+                    is_signed=True,
+                    key="scc_temperature",
+                    unit="°C"
+                ),
+            ]
+        ),
+        RegisterBlock(
+            definitions=[
+                NumericRegisterDefinition(
+                    address=0x1132,
+                    key="bms_state_of_charge",
+                    unit="%"
+                ),
+                NumericRegisterDefinition(
+                    address=0x1133,
+                    key="bms_cv_voltage",
+                    precision=0.1,
+                    unit="V",
+                ),
+                NumericRegisterDefinition(
+                    address=0x1134,
+                    key="bms_float_voltage",
+                    precision=0.1,
+                    unit="V",
+                ),
+                NumericRegisterDefinition(
+                    address=0x1135,
+                    key="bms_cutoff_voltage",
+                    precision=0.1,
+                    unit="V",
+                ),
+                NumericRegisterDefinition(
+                    address=0x1136,
+                    key="bms_max_charge_current",
+                    precision=0.1,
+                    unit="A",
+                ),
+                NumericRegisterDefinition(
+                    address=0x1137,
+                    key="bms_max_discharge_current",
+                    precision=0.1,
+                    unit="A",
+                ),
+                TextRegisterDefinition(
+                    address=0x1138,
+                    key="bms_fault_code",
+                    lookup={}
+                ),
+            ]
+        ),
+        RegisterBlock(
+            definitions=[
+                NumericRegisterDefinition(
+                    address=0x1159,
+                    key="pv2_voltage",
+                    precision=0.1,
+                    unit="V",
+                ),
+                NumericRegisterDefinition(
+                    address=0x115A,
+                    is_signed=True,
+                    key="pv2_current",
+                    precision=0.1,
+                    unit="A"
+                ),
+                NumericRegisterDefinition(
+                    address=0x115B,
+                    is_signed=True,
+                    key="pv2_power",
+                    unit="W",
+                )
+            ]
+        ),
+        RegisterBlock(
+            definitions=[
+                NumericRegisterDefinition(
+                    address=0x1200,
+                    key="battery_line_voltage",
+                    precision=0.1,
+                    unit="V"
+                ),
+                NumericRegisterDefinition(
+                    address=0x1201,
+                    key="battery_charge_discharge_limit_voltage",
+                    precision=0.1,
+                    unit="V"
+                ),
+                NumericRegisterDefinition(
+                    address=0x1202,
+                    key="battery_max_charge_current_limit",
+                    precision=0.1,
+                    unit="A"
+                ),
+                NumericRegisterDefinition(
+                    address=0x1203,
+                    key="battery_max_discharge_current_limit",
+                    precision=0.1,
+                    unit="A"
+                ),
+            ]
+        ),
+        RegisterBlock(
+            definitions=[
+                NumericRegisterDefinition(
+                    address=0x120C,
+                    is_signed=True,
+                    key="battery_current",
+                    precision=0.1,
+                    unit="A",
+                ),
+                NumericRegisterDefinition(
+                    address=0x120D,
+                    key="battery_voltage",
+                    precision=0.01,
+                    unit="V",
+                ),
+                NumericRegisterDefinition(
+                    address=0x1210,
+                    key="battery_state_of_charge",
+                    precision=0.1,
+                    unit="%",
+                ),
+                NumericRegisterDefinition(
+                    address=0x1211,
+                    key="battery_state_of_health",
+                    precision=0.1,
+                    unit="%",
                 )
             ]
         ),
