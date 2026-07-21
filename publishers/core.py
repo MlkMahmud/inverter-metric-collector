@@ -11,7 +11,7 @@ logger = get_logger(__name__)
 
 _PUBLISHER_MAP: Dict[Publishers, Type[Publisher[PublisherConfig]]] = {
     Publishers.GENERIC: GenericPublisher,
-    Publishers.HOME_ASSISTANT: HomeAssistantPublisher
+    Publishers.HOME_ASSISTANT: HomeAssistantPublisher,
 }
 
 
@@ -23,10 +23,7 @@ def _create_publisher(config_str: str) -> Publisher[PublisherConfig]:
         return publisher_class(config)
 
     except ValidationError as e:
-        logger.error(
-            "Publisher configuration is not valid",
-            config=config_str
-        )
+        logger.error("Publisher configuration is not valid", config=config_str)
         raise e
 
 
@@ -35,9 +32,7 @@ def _get_publisher(name: Publishers) -> Type[Publisher[PublisherConfig]]:
 
     if not publisher:
         logger.error("Publisher lookup failed", publisher_name=name)
-        raise NotImplementedError(
-            f"Publisher '{name}' is not listed in registry"
-        )
+        raise NotImplementedError(f"Publisher '{name}' is not listed in registry")
 
     return publisher
 

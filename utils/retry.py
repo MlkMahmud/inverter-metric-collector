@@ -25,18 +25,18 @@ def retry[T](
             if is_final_attempt:
                 logger.error(
                     f"Function execution failed permanently after {attempt} total attempts",
-                    error=e
+                    error=e,
                 )
                 raise e
 
             jitter = randint(1, 5)
-            backoff = (actual_delay * (2 ** attempt)) + jitter
+            backoff = (actual_delay * (2**attempt)) + jitter
 
             logger.warning(
                 f"Function execution failed. Retrying in {backoff} seconds...",
                 attempt=attempt,
                 total_allowed_attempts=total_attempts,
-                error=e
+                error=e,
             )
             time.sleep(backoff)
             continue

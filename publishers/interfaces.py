@@ -1,5 +1,5 @@
 from enum import StrEnum
-from typing import Any, List, Protocol, runtime_checkable, TypeVar
+from typing import Any, List, Protocol, TypeVar, runtime_checkable
 
 from pydantic import BaseModel, ConfigDict
 
@@ -17,11 +17,9 @@ ConfigType = TypeVar("ConfigType", bound=PublisherConfig, covariant=True)
 
 @runtime_checkable
 class Publisher(Protocol[ConfigType]):
-    def __init__(self, config: ConfigType) -> None:
-        ...
+    def __init__(self, config: ConfigType) -> None: ...
 
-    def publish(self, metrics: List[Metric]) -> Any:
-        ...
+    def publish(self, metrics: List[Metric]) -> Any: ...
 
 
 class Publishers(StrEnum):

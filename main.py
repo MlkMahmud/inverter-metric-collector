@@ -8,7 +8,7 @@ from typing import List
 import structlog
 
 from inverters import InverterModel, ModbusConfig, get_inverter_class
-from publishers import create_publishers, Publisher, PublisherConfig
+from publishers import Publisher, PublisherConfig, create_publishers
 
 environment = os.environ.get("ENVIRONMENT", "dev")
 is_production = environment == "production"
@@ -16,16 +16,18 @@ is_production = environment == "production"
 logging.basicConfig(
     level=logging.INFO,
     format="%(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)]
+    handlers=[logging.StreamHandler(sys.stdout)],
 )
 
 structlog.configure(
     processors=[
         structlog.processors.TimeStamper(fmt="iso"),
         structlog.processors.add_log_level,
-        structlog.processors.JSONRenderer(
-        ) if is_production else structlog.dev.ConsoleRenderer(),
-
+        (
+            structlog.processors.JSONRenderer()
+            if is_production
+            else structlog.dev.ConsoleRenderer()
+        ),
     ],
     logger_factory=structlog.stdlib.LoggerFactory(),
     wrapper_class=structlog.stdlib.BoundLogger,
@@ -44,50 +46,31 @@ def main() -> None:
         type=str,
         required=True,
         choices=[m.value for m in InverterModel],
-        help="The specific hardware model string."
+        help="The specific hardware model string.",
     )
 
     parser.add_argument(
-        "--interval",
-        type=int,
-        default=5,
-        help="Polling interval in seconds"
+        "--interval", type=int, default=5, help="Polling interval in seconds"
     )
 
     parser.add_argument(
-        "--port",
-        type=str,
-        default="/dev/ttyUSB0",
-        help="Serial port connection path"
+        "--port", type=str, default="/dev/ttyUSB0", help="Serial port connection path"
     )
 
     parser.add_argument(
-        "--baudrate",
-        type=int,
-        default=9600,
-        help="Modbus serial baudrate"
+        "--baudrate", type=int, default=9600, help="Modbus serial baudrate"
     )
 
     parser.add_argument(
-        "--timeout",
-        type=float,
-        default=2.0,
-        help="Modbus response timeout in seconds"
+        "--timeout", type=float, default=2.0, help="Modbus response timeout in seconds"
     )
 
     parser.add_argument(
-        "--slave-id",
-        type=int,
-        default=1,
-        help="Modbus slave/unit ID address"
+        "--slave-id", type=int, default=1, help="Modbus slave/unit ID address"
     )
 
     parser.add_argument(
-        "--parity",
-        type=str,
-        default="N",
-        choices=["N", "E", "O"],
-        help="Serial parity"
+        "--parity", type=str, default="N", choices=["N", "E", "O"], help="Serial parity"
     )
 
     parser.add_argument(
@@ -101,7 +84,7 @@ def main() -> None:
         action="append",
         dest="publisher_configs",
         default=[],
-        help="JSON string defining a publisher configuration. Must include a 'name' field."
+        help="JSON string defining a publisher configuration. Must include a 'name' field.",
     )
 
     args = parser.parse_args()
@@ -117,7 +100,7 @@ def main() -> None:
             baudrate=args.baudrate,
             timeout=args.timeout,
             slave_id=args.slave_id,
-            parity=args.parity
+            parity=args.parity,
         ),
         model=args.model,
     )
@@ -133,7 +116,7 @@ def main() -> None:
     if args.publisher_configs:
         logger.info(
             "Initializing publishers from provided configuration...",
-            configuration=args.publisher_configs
+            configuration=args.publisher_configs,
         )
         publishers = create_publishers(args.publisher_configs)
         logger.info("Successfully initialized all publishers")
@@ -151,7 +134,7 @@ def main() -> None:
                     publisher.publish(metrics)
 
             except Exception as e:
-                logger.exception(f"Modbus Read Failure", exc_info=e)
+                logger.exception("Modbus Read Failure", exc_info=e)
 
             elapsed = time.time() - start_time
             time.sleep(max(0, args.interval - elapsed))

@@ -16,8 +16,8 @@ def get_inverter_class(model: InverterModel) -> Type[Inverter]:
     target_class = _INVERTER_MODEL_CLASS_MAP.get(model, None)
 
     if not target_class:
-        logger.error(
-            f"Driver lookup failed. Model enum '{model}' has no mapped class.")
+        logger.error(f"Driver lookup failed. Model enum '{model}' has no mapped class.")
         raise NotImplementedError(
-            f"Driver for model {model.value} is missing in registry.")
+            f"Driver for model {model.value} is missing in registry."
+        )
     return target_class
