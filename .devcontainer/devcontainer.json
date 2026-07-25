@@ -2,7 +2,7 @@
   "image": "mcr.microsoft.com/devcontainers/python:dev-3.14-bookworm",
   "postCreateCommand": "bash ./.devcontainer/setup.sh",
   "containerEnv": {
-    "PYTHONPATH": "." // For VS Code's test pane discovery
+    "PYTHONPATH": "."
   },
   "customizations": {
     "vscode": {
@@ -10,9 +10,17 @@
         "ms-python.python",
         "ms-python.vscode-pylance",
         "esbenp.prettier-vscode",
+        "ms-python.black-formatter",
         "ms-python.isort",
         "streetsidesoftware.code-spell-checker"
-      ]
+      ],
+      "settings": {
+        "cSpell.words": ["IVEM", "Modbus", "baudrate", "bytesize", "stopbits"],
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.black-formatter"
+        },
+        "isort.args": ["--profile", "black"]
+      }
     }
   }
 }

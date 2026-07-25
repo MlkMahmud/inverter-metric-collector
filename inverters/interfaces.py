@@ -64,8 +64,17 @@ class RegisterBlock:
     ):
         self.definitions = definitions
 
-        self.min_address = min(register.address for register in definitions)
-        self.max_address = max(register.address for register in definitions)
+        self.min_address = (
+            0
+            if not self.definitions
+            else min(register.address for register in definitions)
+        )
+
+        self.max_address = (
+            0
+            if not self.definitions
+            else max(register.address for register in definitions)
+        )
 
     @property
     def count(self) -> int:
