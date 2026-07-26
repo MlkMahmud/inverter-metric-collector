@@ -21,6 +21,7 @@ class TestModbusConfig:
         assert config.bytesize == 8
         assert config.parity == "N"
         assert config.port == "/dev/ttyUSB0"
+        assert config.retries == 3
         assert config.slave_id == 1
         assert config.stopbits == 1
         assert config.timeout == 2.0
@@ -30,6 +31,7 @@ class TestModbusConfig:
         bytesize = 10
         parity = "T"
         port = "/dev/ttyUSB1"
+        retries = 1
         slave_id = 2
         stopbits = 2
         timeout = 3.0
@@ -39,6 +41,7 @@ class TestModbusConfig:
             bytesize=bytesize,
             parity=parity,
             port=port,
+            retries=retries,
             slave_id=slave_id,
             stopbits=stopbits,
             timeout=timeout,
@@ -48,6 +51,7 @@ class TestModbusConfig:
         assert config.bytesize == bytesize
         assert config.parity == parity
         assert config.port == port
+        assert config.retries == retries
         assert config.slave_id == slave_id
         assert config.stopbits == stopbits
         assert config.timeout == timeout
@@ -62,7 +66,7 @@ class TestRegisterBlock:
     _max_addr = max(d.address for d in _definitions)
     _min_addr = min(d.address for d in _definitions)
 
-    def test_is_initialized_correctly_without_errors(self):
+    def test_constructor_initializes_object_without_errors(self):
         addr1, addr2 = 1, 2
 
         cls = RegisterBlock(
@@ -77,7 +81,7 @@ class TestRegisterBlock:
         assert cls.max_address == addr2
         assert cls.min_address == addr1
 
-    def test_it_correctly_calculates_the_count_of_addresses_to_read_when_definitions_list_is_non_empty(
+    def test_constructor_correctly_calculates_the_count_of_addresses_to_read_when_definitions_list_is_non_empty(
         self,
     ):
         expected_count = (self._max_addr - self._min_addr) + 1
@@ -85,14 +89,14 @@ class TestRegisterBlock:
 
         assert cls.count == expected_count
 
-    def test_it_correctly_calculates_the_count_of_addresses_to_read_when_definitions_list_is_empty(
+    def test_constructor_correctly_calculates_the_count_of_addresses_to_read_when_definitions_list_is_empty(
         self,
     ):
         cls = RegisterBlock(definitions=[])
 
         assert cls.count == 0
 
-    def test_it_correctly_parses_block_response(self):
+    def test_parse_block_response(self):
         count = self._max_addr - self._min_addr + 1
         raw_words = [randint(1, 1000) for _ in range(count)]
 
@@ -115,7 +119,7 @@ class TestRegisterBlock:
 
 
 class TestNumericRegisterDefinition:
-    def test_it_correctly_parses_raw_word(self):
+    def test_parse_word(self):
         raw_word = 95
         defn = NumericRegisterDefinition(
             address=0x1101, key="state_of_charge", unit="V"
@@ -126,7 +130,7 @@ class TestNumericRegisterDefinition:
         assert isinstance(metric, Metric)
         assert metric.value == raw_word
 
-    def test_it_correctly_applies_precision_to_raw_word(self):
+    def test_parse_word_correctly_applies_precision(self):
         raw_word = 5537
         defn = NumericRegisterDefinition(
             address=0x2201, key="battery_voltage", unit="V", precision=0.01
@@ -143,7 +147,7 @@ class TestNumericRegisterDefinition:
             pytest.param(400, 400, id="positive value"),
         ],
     )
-    def test_is_correctly_applies_sign_to_raw_word(
+    def test_parse_word_correctly_applies_sign(
         self, raw_word: int, expected_value: int
     ):
         defn = NumericRegisterDefinition(
@@ -159,7 +163,7 @@ class TestNumericRegisterDefinition:
 
 
 class TestTextRegisterDefinition:
-    def test_it_maps_raw_word_to_label_using_lookup_table(self):
+    def test_parse_word_maps_raw_word_to_label_using_lookup_table(self):
         lookup: Dict[int, str] = {0: "off", 1: "on"}
 
         defn = TextRegisterDefinition(
@@ -172,7 +176,7 @@ class TestTextRegisterDefinition:
         assert isinstance(metric, Metric)
         assert metric.value == "on"
 
-    def test_it_maps_unknown_values_to_unknown_constant(self):
+    def test_parse_word_maps_unknown_values_to_unknown_constant(self):
         lookup: Dict[int, str] = {0: "off", 1: "on"}
 
         defn = TextRegisterDefinition(

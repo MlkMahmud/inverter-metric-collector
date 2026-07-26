@@ -62,6 +62,10 @@ def main() -> None:
     )
 
     parser.add_argument(
+        "--bytesize", type=int, choices=[7, 8], default=8, help="Modbus serial bytesize"
+    )
+
+    parser.add_argument(
         "--timeout", type=float, default=2.0, help="Modbus response timeout in seconds"
     )
 
@@ -70,7 +74,22 @@ def main() -> None:
     )
 
     parser.add_argument(
+        "--stopbits",
+        type=int,
+        choices=[1, 2],
+        default=1,
+        help="Modbus number of stop bits",
+    )
+
+    parser.add_argument(
         "--parity", type=str, default="N", choices=["N", "E", "O"], help="Serial parity"
+    )
+
+    parser.add_argument(
+        "--retries",
+        type=int,
+        default=3,
+        help="Modbus max number of retries per request",
     )
 
     parser.add_argument(
@@ -98,9 +117,12 @@ def main() -> None:
         config=ModbusConfig(
             port=args.port,
             baudrate=args.baudrate,
-            timeout=args.timeout,
-            slave_id=args.slave_id,
+            bytesize=args.bytesize,
             parity=args.parity,
+            retries=args.retries,
+            slave_id=args.slave_id,
+            stopbits=args.stopbits,
+            timeout=args.timeout,
         ),
         model=args.model,
     )

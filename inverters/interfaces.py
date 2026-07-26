@@ -42,6 +42,7 @@ class ModbusConfig:
     bytesize: int = 8
     parity: str = "N"
     port: str = "/dev/ttyUSB0"
+    retries: int = 3
     slave_id: int = 1
     stopbits: int = 1
     timeout: float = 2.0

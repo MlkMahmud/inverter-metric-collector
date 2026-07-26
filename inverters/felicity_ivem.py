@@ -286,6 +286,7 @@ class FelicityIvemInverter:
             bytesize=self.config.bytesize,
             parity=self.config.parity,
             port=self.config.port,
+            retries=self.config.retries,
             stopbits=self.config.stopbits,
             timeout=self.config.timeout,
         )
