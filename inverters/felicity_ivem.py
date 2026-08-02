@@ -228,7 +228,6 @@ class FelicityIvemInverter:
                     precision=0.1,
                     unit="A",
                 ),
-                TextRegisterDefinition(address=0x1138, key="bms_fault_code", lookup={}),
             ]
         ),
         RegisterBlock(
