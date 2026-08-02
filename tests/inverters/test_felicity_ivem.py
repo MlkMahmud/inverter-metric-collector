@@ -80,7 +80,7 @@ class TestFelicityIvemInverter:
 
     def test_register_blocks_integrity(self, inverter: FelicityIvemInverter):
         blocks = inverter._REGISTER_BLOCKS  # type: ignore
-        assert len(blocks) == 9
+        assert len(blocks) == 10
 
         keys = [defn.key for block in blocks for defn in block.definitions]
         assert len(keys) == len(set(keys)), "Duplicate register keys detected"
