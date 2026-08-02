@@ -11,7 +11,7 @@ from inverters.interfaces import ModbusConfig
 class TestFelicityIvemInverter:
     @pytest.fixture(autouse=True)
     def mock_logger(self):
-        with patch("inverters.felicity_ivem.logger") as m:
+        with patch("inverters.felicity_ivem.core.logger") as m:
             m.error = MagicMock()
             m.info = MagicMock()
             yield m
@@ -40,13 +40,13 @@ class TestFelicityIvemInverter:
 
     @pytest.fixture
     def mock_modbus_serial_client_cls(self, mock_modbus_serial_client: MagicMock):
-        with patch("inverters.felicity_ivem.ModbusSerialClient") as cls:
+        with patch("inverters.felicity_ivem.core.ModbusSerialClient") as cls:
             cls.return_value = mock_modbus_serial_client
             yield cls
 
     @pytest.fixture(autouse=True)
     def mock_retry(self):
-        with patch("inverters.felicity_ivem.retry") as m:
+        with patch("inverters.felicity_ivem.core.retry") as m:
             m.return_value = True
             yield m
 
