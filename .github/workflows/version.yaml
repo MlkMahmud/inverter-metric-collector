@@ -1,15 +1,24 @@
-name: Test
+name: Version
 
 on:
+  workflow_run:
+    branches: [main]
+    workflows: [Test]
+    types: [completed]
+
   push:
     branches:
-      - "*"
+      - main
 
 jobs:
-  test:
+  version:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
     env:
       PYTHONPATH: "."
 
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
 
     steps:
@@ -27,5 +36,7 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
-      - name: Unit tests
-        run: uv run pytest --cov --cov-report term-missing
+      - name: Bump version and create git tag
+        run: |
+          ./scripts/version.py
+          git push && git push --tags
