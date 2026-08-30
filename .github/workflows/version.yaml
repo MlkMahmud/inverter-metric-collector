@@ -19,6 +19,7 @@ jobs:
 
     permissions:
       contents: write
+
     runs-on: ubuntu-latest
 
     steps:
@@ -38,5 +39,5 @@ jobs:
 
       - name: Bump version and create git tag
         run: |
-          ./scripts/version.py
+          uv run scripts/version.py
           git push && git push --tags

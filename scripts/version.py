@@ -1,5 +1,3 @@
-#! /usr/bin/env python
-
 import os
 import re
 import subprocess
@@ -87,8 +85,8 @@ def update_config_project_version(config: tomlkit.TOMLDocument, version: str):
 
 
 def main():
-    # if is_worktree_dirty():
-    #     raise RuntimeError("git worktree contains uncommitted changes")
+    if is_worktree_dirty():
+        raise RuntimeError("git worktree contains uncommitted changes")
 
     config = get_config()
     commit_message = exec(["git", "log", "-1", "--pretty=%B"])
