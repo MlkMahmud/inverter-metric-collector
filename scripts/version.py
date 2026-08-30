@@ -101,6 +101,7 @@ def main():
 
     update_config_project_version(config, next_version)
 
+    exec(["uv", "sync"])
     exec(["git", "add", "."])
     exec(["git", "commit", "-m", f"chore: version {next_version} [skip ci]"])
     exec(["git", "tag", f"v{next_version}"])
