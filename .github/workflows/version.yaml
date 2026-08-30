@@ -37,6 +37,11 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
+      - name: Configure git
+        run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+
       - name: Bump version and create git tag
         run: |
           uv run scripts/version.py
