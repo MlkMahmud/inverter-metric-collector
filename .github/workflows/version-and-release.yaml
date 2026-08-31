@@ -1,14 +1,10 @@
-name: Release
+name: Version and Release
 
 on:
   workflow_run:
     branches: [main]
     workflows: [Test]
     types: [completed]
-
-  push:
-    branches:
-      - main
 
 permissions:
   contents: write
@@ -56,6 +52,9 @@ jobs:
     needs: version
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
       - name: Release latest version
         env:
           TAG_NAME: ${{ needs.version.outputs.tag_name }}
