@@ -43,8 +43,8 @@ jobs:
         run: |
           git remote set-url origin "https://x-access-token:${{ secrets.GH_ACCESS_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git/"
 
-          git config user.name "Malik Mahmud"
-          git config user.email "almalikmahmud@gmail.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Bump version and create git tag
         run: |
