@@ -1,7 +1,7 @@
 import os
 import re
 import subprocess
-from typing import Any, List, Literal, Tuple, cast
+from typing import List, Literal, Tuple
 
 import tomlkit
 from tomlkit.items import Table
@@ -25,7 +25,7 @@ def exec(command: List[str]) -> str:
 def get_config() -> tomlkit.TOMLDocument:
     with open(PYPROJECT_PATH, "rb") as f:
         doc = tomlkit.load(f)
-        project = cast(Any | None, doc["project"])
+        project = doc["project"]
 
         if not project or not isinstance(project, Table):
             raise TypeError("pyproject.toml must contain a [project] table")
@@ -47,7 +47,7 @@ def get_bump_type(commit_message: str) -> Literal["major", "minor", "patch"]:
     if re.search(r"^feat:", commit_message, re.IGNORECASE):
         return "minor"
 
-    return "minor"
+    return "patch"
 
 
 def get_next_version(commit_message: str, current_version: str) -> str:
