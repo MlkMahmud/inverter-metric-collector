@@ -104,7 +104,7 @@ def main():
     exec(["uv", "sync"])
     exec(["git", "add", "."])
     exec(["git", "commit", "-m", f"chore: version {next_version} [skip ci]"])
-    exec(["git", "tag", f"v{next_version}"])
+    exec(["git", "tag", "-a", f"v{next_version}", "-m", f"version v{next_version}"])
 
     return
 
