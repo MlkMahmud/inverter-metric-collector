@@ -71,5 +71,5 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
         run: |
           IMAGE_NAME=$(echo ${{ github.repository }} | tr [:upper:] [:lower:])
-          IMAGE_VERSION=$(echo '${{ steps.meta.outputs.json }}' | jq -r '.labels["org.opencontainers.image.version"]')"
+          IMAGE_VERSION=$(echo '${{ steps.meta.outputs.json }}' | jq -r '.labels["org.opencontainers.image.version"]')
           gh attestation verify oci://${{ env.REGISTRY }}/${IMAGE_NAME}:${IMAGE_VERSION} --owner "${GITHUB_REPOSITORY_OWNER}"
