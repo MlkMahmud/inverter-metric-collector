@@ -1,4 +1,4 @@
-name: Version and Release
+name: Version
 
 on:
   workflow_run:
@@ -15,9 +15,6 @@ jobs:
 
     env:
       PYTHONPATH: "."
-
-    outputs:
-      tag_name: ${{ steps.bump_version.outputs.tag_name }}
 
     runs-on: ubuntu-latest
 
@@ -46,17 +43,3 @@ jobs:
         run: |
           uv run scripts/version.py
           git push && git push --tags
-          echo "tag_name=$(git describe --tags --abbrev=0 | tr -d '\n')" >> "$GITHUB_OUTPUT"
-
-  release:
-    needs: version
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-
-      - name: Release latest version
-        env:
-          TAG_NAME: ${{ needs.version.outputs.tag_name }}
-          GH_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
-        run: gh release create "${TAG_NAME}" --fail-on-no-commits --generate-notes
